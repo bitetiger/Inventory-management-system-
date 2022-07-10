@@ -9,8 +9,24 @@ const sns = new AWS.SNS({ region: "ap-northeast-2" }) // STEP 2
 //./database를 불러와서 연결한다. (import와 비슷한 역할)
 const {
   connectDb,
-  queries: { getProduct, setStock } //커리 선언하기
+  queries: { getProduct, setStock, increaseStock } //커리 선언하기
 } = require('./database')
+
+//donut 재고 증가
+app.post("/product/donut", connectDb, async (req, res, next) => {
+  const [ result ] = await req.conn.query(
+    getProduct('CP-502101')
+  )
+  if (result.length > 0) {
+    const product = result[0]
+    const incremental = 10
+
+    await req.conn.query(increaseStock(product.product_id, incremental))
+    return res.status(200).json({ message: `입고 완료! 남은 재고: ${product.stock + incremental}`});
+  } else {
+    return res.status(400).json({ message: "상품 없음" });
+  }
+});
 
 //donut 상품 정보 조회, connectDB를 통해 DB에 연결해서 진행한다.
 app.get("/product/donut", connectDb, async (req, res, next) => {
