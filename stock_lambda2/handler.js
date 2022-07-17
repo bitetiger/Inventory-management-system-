@@ -3,13 +3,9 @@ const axios = require('axios').default
 exports.handler = async (event) => {
   console.log(event.Records)
 
-  // for (const record of event.Records) {
-  //   console.log("Message Body: ", record.body);
-  // }
+let text = JSON.stringify(event.Records[0])
 
-
-let body = JSON.stringify(event.Records)
-console.log(body)
+console.log(text)
 
 const payload = {
         "MessageGroupId": body.messageId,
@@ -19,6 +15,8 @@ const payload = {
         "MessageAttributeRequester": "부산시 시장",
         "CallbackUrl": "https://6ntrcuns50.execute-api.ap-northeast-2.amazonaws.com/product/donut"
   }
+  
+  console.log(payload)
   
   axios.post('http://factory.p3.api.codestates-devops.be:8080/api/manufactures', payload)
   .then(function (response) {
